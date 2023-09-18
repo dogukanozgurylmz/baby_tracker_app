@@ -1,0 +1,80 @@
+import 'package:baby_tracker_app/features/core/constants/color_constant.dart';
+import 'package:baby_tracker_app/features/core/constants/text_constant.dart';
+import 'package:baby_tracker_app/features/presentations/login/cubit/login_cubit.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+class TimeOfBirthTextFieldWidget extends StatelessWidget {
+  const TimeOfBirthTextFieldWidget({
+    super.key,
+    required this.cubit,
+  });
+
+  final LoginCubit cubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      onChanged: (value) {
+        cubit.nullControle();
+      },
+      onTap: () async {
+        if (kIsWeb) {
+          final selectedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(1900),
+            lastDate: DateTime.now(),
+          );
+          cubit.selectTime(selectedDate!);
+        } else {
+          showCupertinoModalPopup<DateTime>(
+            context: context,
+            builder: (BuildContext context) {
+              return Container(
+                height: 216,
+                padding: const EdgeInsets.only(top: 6.0),
+                margin: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                color: CupertinoColors.systemBackground.resolveFrom(context),
+                child: SafeArea(
+                  top: false,
+                  child: CupertinoDatePicker(
+                    initialDateTime: DateTime.now(),
+                    mode: CupertinoDatePickerMode.time,
+                    use24hFormat: false,
+                    showDayOfWeek: true,
+                    onDateTimeChanged: (DateTime newDate) {
+                      cubit.selectTime(newDate);
+                      cubit.nullControle();
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        }
+      },
+      readOnly: true,
+      controller: cubit.timeOfBirthTextController,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        fillColor: ColorConstant.grey,
+        filled: true,
+        contentPadding: const EdgeInsets.all(20),
+        hintText: TextConstant.timeOfBirth,
+        hintStyle: const TextStyle(
+          color: ColorConstant.grey2,
+          fontSize: 14,
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+}
